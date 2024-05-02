@@ -153,3 +153,31 @@
     opacity: 1;
   }
 }
+
+body {
+  padding: 20px;
+}
+
+.table-container {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.table-header {
+  background-color: #343a40;
+  color: #fff;
+  padding: 10px 15px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f2f2f2;
+}

@@ -1,160 +1,90 @@
-{% load static %}
-<!-- Correct placement inside the HTML document -->
+{%extends "base.html" %} {% block main_content %}
+<div class="table-container">
+  <div class="table-header">
+    <h2>Stats Table</h2>
+  </div>
+  <button onclick="window.location.reload()" class="btn btn-primary">
+    Refresh
+  </button>
+  <div class="text-center mb-3">
+    <button onclick="sortTable(0)" class="btn btn-primary">By Name</button>
+    <button onclick="sortTable(1)" class="btn btn-secondary">By Rank</button>
+    <button onclick="sortTable(2)" class="btn btn-success">By Position</button>
+  </div>
+  <table class="table table-striped" id="statsTable">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Rank</th>
+        <th scope="col">Position</th>
+        <th scope="col">Points Per Game</th>
+        <th scope="col">Rebounds Per Game</th>
+        <th scope="col">Assists Per Game</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for player in players %}
+      <tr>
+        <td>{{ player.full_name }}</td>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ player.position }}</td>
+        <td>{{ player.ppg|floatformat:1 }}</td>
+        <td>{{ player.rpg|floatformat:1 }}</td>
+        <td>{{ player.apg|floatformat:1 }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6">No players found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NBA Stats</title>
-    <link rel="stylesheet" href="{% static 'css/home.css' %}" />
-    <!-- Load CSS file -->
-    <link
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <!-- Bootstrap CDN -->
-    <style>
-      body {
-        padding: 20px;
-      }
-
-      .table-container {
-        background-color: #fff;
-        border: 1px solid #dee2e6;
-        border-radius: 0.25rem;
-        overflow: hidden;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-      }
-
-      .table-header {
-        background-color: #343a40;
-        color: #fff;
-        padding: 10px 15px;
-        border-bottom: 1px solid #dee2e6;
-      }
-
-      .table-header h2 {
-        margin: 0;
-        font-size: 1.5rem;
-      }
-
-      .table-striped tbody tr:nth-of-type(odd) {
-        background-color: #f2f2f2;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="loading">
-      <span class="l">L</span>
-      <span class="o">o</span>
-      <span class="a">a</span>
-      <span class="d">d</span>
-      <span class="i">i</span>
-      <span class="n">n</span>
-      <span class="g">g</span>
-      <span class="d1">.</span>
-      <span class="d2">.</span>
-      <div class="load">
-        <div class="progress"></div>
-        <div class="progress"></div>
-        <div class="progress"></div>
-        <div class="progress"></div>
-      </div>
-    </div>
-    <pre></pre>
-    <div class="table-container">
-      <div class="table-header">
-        <h2>Stats Table</h2>
-      </div>
-      <button onclick="window.location.reload()" class="btn btn-primary">
-        Refresh
-      </button>
-      <div class="text-center mb-3">
-        <button onclick="sortTable(0)" class="btn btn-primary">By Name</button>
-        <button onclick="sortTable(1)" class="btn btn-secondary">
-          By Rank
-        </button>
-        <button onclick="sortTable(2)" class="btn btn-success">
-          By Position
-        </button>
-      </div>
-      <table class="table table-striped" id="statsTable">
-        <thead>
-          <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Rank</th>
-            <th scope="col">Position</th>
-            <th scope="col">Points Per Game</th>
-            <th scope="col">Rebounds Per Game</th>
-            <th scope="col">Assists Per Game</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for player in players %}
-          <tr>
-            <td>{{ player.full_name }}</td>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ player.position }}</td>
-            <td>{{ player.ppg|floatformat:1 }}</td>
-            <td>{{ player.rpg|floatformat:1 }}</td>
-            <td>{{ player.apg|floatformat:1 }}</td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="6">No players found.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    <script>
-      function sortTable(n) {
-        var table,
-          rows,
-          switching,
-          i,
-          x,
-          y,
-          shouldSwitch,
-          dir,
-          switchcount = 0;
-        table = document.getElementById("statsTable");
-        switching = true;
-        dir = "asc"; // Set the sorting direction to ascending initially
-        while (switching) {
-          switching = false;
-          rows = table.rows;
-          for (i = 1; i < rows.length - 1; i++) {
-            shouldSwitch = false;
-            x = rows[i].getElementsByTagName("TD")[n];
-            y = rows[i + 1].getElementsByTagName("TD")[n];
-            if (dir == "asc") {
-              if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                shouldSwitch = true;
-                break;
-              }
-            } else if (dir == "desc") {
-              if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                shouldSwitch = true;
-                break;
-              }
-            }
+<script>
+  function sortTable(n) {
+    var table,
+      rows,
+      switching,
+      i,
+      x,
+      y,
+      shouldSwitch,
+      dir,
+      switchcount = 0;
+    table = document.getElementById("statsTable");
+    switching = true;
+    dir = "asc"; // Set the sorting direction to ascending initially
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+      for (i = 1; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("TD")[n];
+        y = rows[i + 1].getElementsByTagName("TD")[n];
+        if (dir == "asc") {
+          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+            shouldSwitch = true;
+            break;
           }
-          if (shouldSwitch) {
-            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-            switching = true;
-            switchcount++;
-          } else {
-            if (switchcount == 0 && dir == "asc") {
-              dir = "desc";
-              switching = true;
-            }
+        } else if (dir == "desc") {
+          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+            shouldSwitch = true;
+            break;
           }
         }
       }
-    </script>
-  </body>
-</html>
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        switchcount++;
+      } else {
+        if (switchcount == 0 && dir == "asc") {
+          dir = "desc";
+          switching = true;
+        }
+      }
+    }
+  }
+</script>
+{% endblock main_content %}
