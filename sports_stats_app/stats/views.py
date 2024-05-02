@@ -65,3 +65,10 @@ def index(request):
     players_data = get_active_players()
 
     return render(request, 'index.html', {'players': players_data})
+
+def search(request):
+    """Player search page"""
+
+    search_results = {}
+
+    return render(request, 'stats/search.html', {'search_results': search_results})
