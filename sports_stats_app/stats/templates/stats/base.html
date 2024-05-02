@@ -19,9 +19,8 @@
       <li class="active"><a href="#">Home</a></li>
       <li><a href="#">NBA Stats</a></li>
       <li><a href="#">WNBA Stats</a></li>
-      <li><a href="#">Login</a></li>
+      <li><a href="#" onclick="openLoginForm()">Login</a></li>
       <li><a href="#">Register</a></li>
-
     </ul>
     <form class="navbar-form navbar-left" action="/action_page.php">
       <div class="form-group">
@@ -29,6 +28,10 @@
       </div>
       <button type="submit" class="btn btn-default">Submit</button>
     </form>
+    {% if user.is_authenticated %}
+      <p class="navbar-text navbar-right">Hello, {{ user.username }}!</p>
+    {% else %}
+    {% endif %}
   </div>
 </nav> 
 
@@ -36,6 +39,11 @@
   <h3>Navbar Forms</h3>
   <p>Use the .navbar-form class to vertically align form elements (same padding as links) inside the navbar.</p>
 </div>
-
+<script>
+  function openLoginForm() {
+    document.getElementById('id01').style.display='block';
+  }
+  </script>
+  
 </body>
 </html>

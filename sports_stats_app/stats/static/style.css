@@ -1,0 +1,169 @@
+body{
+    font-family: sans-serif monospace !important;
+  
+  }
+  #btn {
+        background-color: navy;
+        color: white;
+        border-radius: 10px;
+        margin: 5px 10px;
+        padding: 10px 15px;
+      }
+  
+      #btn:hover {
+        opacity: 1.5px;
+        transition: ease-in-out;
+        background-color: white;
+        color: blue;
+      }
+  
+      #btn:active {
+        opacity: 1.5px;
+        transition: ease-in-out;
+        background-color: blue;
+        color: black;
+      }
+  
+      #userlog {
+        padding: 8px 13px;
+        font-size: large;
+        font-weight: bolder;
+        color: navy;
+        /* background-color: skyblue;  */
+        border-radius: 3px;
+      }
+  
+      #btnlog {
+        padding: 8px 13px;
+        margin-right: 13px;
+        background-color: red;
+        color: white;
+        border-radius: 10px;
+        text-align: center;
+      }
+  
+      #btnlog:hover {
+        opacity: 1.5px;
+        transition: ease-in-out;
+        background-color: white;
+        color: blue;
+      }
+  
+      #btnlog:active {
+        opacity: 1.5px;
+        transition: ease-in-out;
+        background-color: rgb(155, 155, 221);
+        color: black;
+      }
+  
+  
+  .BadgeColor {
+      background-color: hsla(182, 50%, 39%, 0.608);
+      color: hsla(0, 7%, 6%, 0.697);
+      font-family: 'Arial', sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 8px 12px;
+      border-radius: 5px;
+      border: 1px solid hsla(188, 78%, 50%, 0.8);
+      text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+  }
+
+
+.heading {
+    text-align: center;
+  font-weight: 900;
+  font-size: 30px;
+  color: rgb(16, 137, 211);
+}
+
+.form {
+    margin-bottom: 20px;
+}
+
+.input {
+    width: 100%;
+  background: white;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 20px;
+  margin-top: 15px;
+  box-shadow: #cff0ff 0px 10px 10px -5px;
+  border-inline: 2px solid transparent;
+}
+form .input::-moz-placeholder {
+  color: rgb(170, 170, 170);
+}
+
+.form .input::placeholder {
+  color: rgb(170, 170, 170);
+}
+
+.form .input:focus {
+  outline: none;
+  border-inline: 2px solid #12b1d1;
+}
+
+.form-check {
+    margin-bottom: 10px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: #0056b3;
+}
+
+.social-account-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.social-button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    margin: 0 5px;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    transition: background-color 0.3s;
+}
+
+.social-button:hover {
+    background-color: #f0f0f0;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.agreement {
+    font-size: 12px;
+    text-align: center;
+}
+
+.agreement a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.agreement a:hover {
+    text-decoration: underline;
+}
