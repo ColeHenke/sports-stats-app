@@ -1,12 +1,11 @@
-import logging
-from django.shortcuts import render, redirect, HttpResponse
-from nba_api.stats.static import players
-from nba_api.stats.endpoints import playercareerstats, commonplayerinfo
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .utils import get_player_by_name_variants
+import json
+from django.shortcuts import render
 
 
 # Login Function 
@@ -55,85 +54,15 @@ def register(request):
 
     return render(request, 'register.html', {})
 
-
-def get_player_position(player_id):
-    """Retrieve the position of a player."""
-    try:
-        player_info = commonplayerinfo.CommonPlayerInfo(player_id=player_id)
-        player_details = player_info.get_data_frames()[0]
-        position = player_details['POSITION'].iloc[0]
-        return position if position else 'N/A'
-    except Exception as e:
-        logger.error(f"Failed to fetch position for player {player_id}: {str(e)}")
-        return 'N/A'
-
-def get_active_players():
-    """Get active NBA players."""
-    # Get active NBA players
-    active_players = players.get_active_players()
-
-    # List to store player data
-    player_data = []
-
-    # Counter for limiting to 15 players
-    count = 0
-
-    # Iterate over each active player
-    for player in active_players:
-        # Get player career stats
-        career = playercareerstats.PlayerCareerStats(player_id=player['id'])
-        career_stats = career.get_data_frames()[0]
-
-        # Fetch the player's position using the new function
-        position = get_player_position(player['id'])
-
-        # Extract necessary data
-        player_stats = {
-            'full_name': player['full_name'],
-            'position': position,
-            'ppg': career_stats.iloc[0]['PTS'] / career_stats.iloc[0]['GP'], # Points per game
-            'rpg': career_stats.iloc[0]['REB'] / career_stats.iloc[0]['GP'], # Rebounds per game
-            'apg': career_stats.iloc[0]['AST'] / career_stats.iloc[0]['GP']  # Assists per game
-        }
-
-        # Append player data to list
-        player_data.append(player_stats)
-
-        # Increment counter
-        count += 1
-
-        # Break loop if 15 players have been collected
-        if count == 10:
-            break
-
-    return player_data
-
-# def index(request):
-#     """Render index page."""
-#     # pass
-# #     # Get player data
-#     players_data = get_active_players()
-#     # players_data = []
-#     return render(request, 'index.html', {'players': players_data})
-
-import logging
-import json
-from django.shortcuts import render
-from nba_api.stats.static import players
-from django.http import HttpResponse
-
-# Configuring logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
 # file_path = 'stats\data.json'
 file_path = "stats/data.json"
-num_sorts_by_position = 2
+num_sorts_by_position = 0
 data = None
 
 def load_data():
     global data
     try:
+        print('This code is being hit')
         with open(file_path, 'r') as file:
             data = json.load(file)
     except FileNotFoundError:
@@ -185,36 +114,34 @@ def get_players(sort_option):
     # Iterate over each active player
     result_data = []
     for index, player in enumerate(unique_players, start=1):
+        efficiency = ((player['pts'] * player['reb']) / (player['turnover'] + 100))
         player_stats = {
             'full_name': player['player']['first_name'] + ' ' + player['player']['last_name'],
             'position': player['player']['position'],
             'pts': player['pts'],
             'reb': player['reb'],
-            'turnover': player['turnover'],
+            'efficiency': efficiency,
             'rank': index
         }
         result_data.append(player_stats)
 
+    if sort_option == 4:
+        result_data = sorted(result_data, key=lambda x: x['efficiency'], reverse=True)
     return result_data
 
 @login_required(login_url=login_user)
 def index(request):
     """Render index page."""
-    # Get player data
-    players_data = get_players(1)
     if request.method == 'POST':
-        if 'button' in request.POST:
-            action_value = request.POST['button']
-            if action_value == 'by_name':
-                get_players(3)
-                return HttpResponse("Button 1 was clicked.")
-            elif action_value == 'by_points':
-                get_players(2)
-                return HttpResponse("Button 2 was clicked.")
-            elif action_value == 'by_position':
-                get_players(1)
-
-    # print(players_data)
+        action_value = request.POST.get('button')
+        if action_value == 'by_rebounds':
+            players_data = get_players(3)
+        elif action_value == 'by_points':
+            players_data = get_players(2)
+        elif action_value == 'by_position':
+            players_data = get_players(1)
+    elif request.method == 'GET':
+        players_data = None
     return render(request, 'index.html', {'players': players_data})
 
 
@@ -223,11 +150,11 @@ def index(request):
 def search(request):
     if request.method == 'POST':
         username = request.POST.get('username')
-        search_result = get_player_by_name_variants(username)  # Replace with your actual data fetching logic
+        search_result = get_player_by_name_variants(username)
 
         # Normalize the data to ensure all entries are list of dicts
         if isinstance(search_result, dict):
-            search_results = [search_result]  # Convert a single dict to a list of one dict
+            search_results = [search_result] 
         elif isinstance(search_result, list):
             search_results = search_result
         else:
@@ -260,14 +187,9 @@ def search(request):
         # For a GET request, just render the search page without any data
         return render(request, 'stats/search.html', {'search_results': []})
 
-
-
-
 def logout_user(request):
     logout(request)
     return redirect('login_user')
-
-    
 
 if __name__=="__main__":
     debug=True
