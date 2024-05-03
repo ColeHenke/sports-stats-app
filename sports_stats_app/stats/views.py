@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-file_path = 'sports_stats_app/stats/data.json'
+file_path = 'stats\data.json'
 num_sorts_by_position = 0
 data = None
 
@@ -72,17 +72,18 @@ def get_players(sort_option):
         player_data == get_players_by_rebounds()
     else:
         player_data = get_players_by_rank()
-
+            
     # Iterate over each active player
     for index, player in enumerate(player_data, start=1):
         # Extract necessary data
         player_stats = {
-            'full_name': player['first_name'] + ' ' +  player['last_name'],
-            'position': player['position'],
+            'full_name': player['player']['first_name'] + ' ' +  player['player']['last_name'],
+            'position': player['player']['position'],
             'pts': player['pts'],
             'reb': player['reb'],
             'rank': index
         }
+        #print(player['player']['first_name'])
         # Append player data to list
         player_data.append(player_stats)
 
