@@ -1,45 +1,50 @@
-{%extends "base.html" %} {% block main_content %}
-<div class="table-container">
-  <div class="table-header">
-    <h2>Stats Table</h2>
-  </div>
-  <button onclick="window.location.reload()" class="btn btn-primary">
-    Refresh
-  </button>
-  <div class="text-center mb-3">
-    <button onclick="sortTable(0)" class="btn btn-primary">By Name</button>
-    <button onclick="sortTable(1)" class="btn btn-secondary">By Rank</button>
-    <button onclick="sortTable(2)" class="btn btn-success">By Position</button>
-  </div>
-  <table class="table table-striped" id="statsTable">
-    <thead>
-      <tr>
-        <th scope="col">Name</th>
-        <th scope="col">Rank</th>
-        <th scope="col">Position</th>
-        <th scope="col">Points Per Game</th>
-        <th scope="col">Rebounds Per Game</th>
-        <th scope="col">Assists Per Game</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for player in players %}
-      <tr>
-        <td>{{ player.full_name }}</td>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ player.position }}</td>
-        <td>{{ player.ppg|floatformat:1 }}</td>
-        <td>{{ player.rpg|floatformat:1 }}</td>
-        <td>{{ player.apg|floatformat:1 }}</td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="6">No players found.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+{% extends "base.html" %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container my-4">
+    <div class="text-center mb-3">
+        <h2>Stats Table</h2>
+        <div>
+            <button onclick="window.location.reload()" class="btn btn-primary">Refresh</button>
+        </div>
+        <form action="{% url 'index' %}" method="post" class="d-flex justify-content-center gap-2 mt-3">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit" name="by_name">By Name</button>
+            <button class="btn btn-secondary" type="submit" name="by_points">Points</button>
+            <button class="btn btn-success" type="submit" name="by_position">By Position</button>
+        </form>
+    </div>
+    <table class="table table-striped table-hover" id="statsTable">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Rank</th>
+                <th scope="col">Position</th>
+                <th scope="col">Points Per Game</th>
+                <th scope="col">Rebounds Per Game</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in players %}
+            <tr>
+                <td>{{ player.full_name }}</td>
+                <td>{{ player.rank }}</td>
+                <td>{{ player.position }}</td>
+                <td>{{ player.pts|floatformat:1 }}</td>
+                <td>{{ player.reb|floatformat:1 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No players found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
   function sortTable(n) {
@@ -87,4 +92,4 @@
     }
   }
 </script>
-{% endblock main_content %}
+{% endblock content %}

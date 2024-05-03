@@ -1,9 +1,22 @@
-{% extends "base.html" %} {% block main_content %}
-<div class="content">
-  <form action="">
-    <label for="lname">Player Last Name:</label><br />
-    <input type="text" id="lname" name="lname" /><br /><br />
-    <input type="submit" value="Submit" />
-  </form>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="height: 50vh;">
+    
+    
+
+    <div class="card" style="width: 500px;">
+        <div class="card-body">
+            <h5 class="card-title">Search</h5>
+            <form method="POST" action="{% url 'search' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter username">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
 </div>
-{% endblock main_content %}
+{% endblock content %}
