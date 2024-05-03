@@ -1,9 +1,11 @@
 {% extends "base.html" %} {% block main_content %}
+<hr />
+<br />
 <div class="content">
-  <form action="">
-    <label for="lname">Player Last Name:</label><br />
-    <input type="text" id="lname" name="lname" /><br /><br />
-    <input type="submit" value="Submit" />
+  <form action="{% url 'search' %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="player_last_name" />
+    <button type="submit">Submit</button>
   </form>
 </div>
 {% endblock main_content %}

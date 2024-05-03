@@ -26,11 +26,10 @@
       {% for player in players %}
       <tr>
         <td>{{ player.full_name }}</td>
-        <td>{{ forloop.counter }}</td>
+        <td>{{ player.rank }}</td>
         <td>{{ player.position }}</td>
-        <td>{{ player.ppg|floatformat:1 }}</td>
-        <td>{{ player.rpg|floatformat:1 }}</td>
-        <td>{{ player.apg|floatformat:1 }}</td>
+        <td>{{ player.pts|floatformat:1 }}</td>
+        <td>{{ player.reb|floatformat:1 }}</td>
       </tr>
       {% empty %}
       <tr>
