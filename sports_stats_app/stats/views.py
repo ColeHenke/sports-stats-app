@@ -57,6 +57,7 @@ def register(request):
 # file_path = 'stats\data.json'
 file_path = "stats/data.json"
 num_sorts_by_position = 0
+num_positions = 5
 data = None
 
 def load_data():
@@ -74,22 +75,30 @@ def get_players_by_position():
     """Retrieve the position of players."""
     global num_sorts_by_position
     sorted_players = []
-    if num_sorts_by_position % 3 == 0:
+    if num_sorts_by_position % num_positions == 0:
         for value in data['data']:
             if value['player']['position'] == 'C':
                 sorted_players.append(value)
-    elif num_sorts_by_position % 3 == 1:
+    elif num_sorts_by_position % num_positions == 1:
         for value in data['data']:
             if value['player']['position'] == 'F':
                 sorted_players.append(value)
-    else:
+    elif num_sorts_by_position % num_positions == 2:
         for value in data['data']:
             if value['player']['position'] == 'G':
+                sorted_players.append(value)
+    elif num_sorts_by_position % num_positions == 4:
+        for value in data['data']:
+            if value['player']['position'] == 'F-G':
+                sorted_players.append(value)
+    else:
+        for value in data['data']:
+            if value['player']['position'] == 'F-C':
                 sorted_players.append(value)
     num_sorts_by_position += 1
     return sorted_players
 
-def get_players(sort_option):
+def get_players(sort_option, efficiency_sort):
     """Get active NBA players."""
     player_data = []
     load_data()
@@ -120,13 +129,17 @@ def get_players(sort_option):
             'position': player['player']['position'],
             'pts': player['pts'],
             'reb': player['reb'],
+            'turnover': player['turnover'],
             'efficiency': efficiency,
             'rank': index
         }
         result_data.append(player_stats)
 
-    if sort_option == 4:
+    if efficiency_sort:
+        print('This works')
         result_data = sorted(result_data, key=lambda x: x['efficiency'], reverse=True)
+        for index, player in enumerate(result_data, start=1):
+            player['rank'] = index
     return result_data
 
 @login_required(login_url=login_user)
@@ -134,12 +147,14 @@ def index(request):
     """Render index page."""
     if request.method == 'POST':
         action_value = request.POST.get('button')
-        if action_value == 'by_rebounds':
-            players_data = get_players(3)
+        if action_value == 'by_efficiency':
+            players_data = get_players(3, True)
+        elif action_value == 'by_rebounds':
+            players_data = get_players(3, False)
         elif action_value == 'by_points':
-            players_data = get_players(2)
+            players_data = get_players(2, False)
         elif action_value == 'by_position':
-            players_data = get_players(1)
+            players_data = get_players(1, False)
     elif request.method == 'GET':
         players_data = None
     return render(request, 'index.html', {'players': players_data})
