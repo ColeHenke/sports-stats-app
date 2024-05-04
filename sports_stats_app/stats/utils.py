@@ -12,7 +12,11 @@ headers = {
 # Function to search for players by name with multiple attempts
 def get_player_by_name_variants(first_name):
     name_variants = [
-        f'{first_name}'               # "LeBron"
+        f'{first_name}',            # "LeBron"
+        f'{first_name.lower()}',
+        f'{first_name.upper()}',
+        f'{first_name.capitalize()}'
+        
     ]
     for name in name_variants:
         params = {'search': name}
@@ -20,12 +24,8 @@ def get_player_by_name_variants(first_name):
         if response.status_code == 200:
             data = response.json()
             if data['data']:
-                return data['data'][0]  # Return the first player that matches the name
+                return data['data']  # Return the first player that matches the name
     return None
-
-# Call the function and print the results for LeBron James
-# player_info = get_player_by_name_variants('Lebron', 'james')
-# print(player_info)
 
 
 import json
@@ -107,6 +107,3 @@ def get_players(sort_option):
         result_data.append(player_stats)
 
     return result_data
-
-
-

@@ -7,6 +7,10 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .utils import get_player_by_name_variants
+import json
+from nba_api.live.nba.endpoints import scoreboard
+
+
 
 
 # Login Function 
@@ -19,116 +23,51 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            messages.success(request, f'You have successfully logged in {request.user.username}...')
             return redirect('index')
         else:
-            # Display appropriate error messages for invalid credentials
+            # Check if the user exists to provide a specific error message
             user_exists = User.objects.filter(username=username).exists()
             if user_exists:
                 messages.error(request, 'Invalid password. Please try again.')
             else:
                 messages.error(request, 'Invalid username. Please try again.')
-            return render(request, 'login.html')
+            return render(request, 'login.html', {'username': username})
 
     # Show the login page for GET requests
     return render(request, 'login.html')
 
-
 def register(request):
     if request.method == 'POST':
-        # get the username and password
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        try:
-            # check if th username and password is valid then try to create new account 
-            user = User.objects.create_user(username=username, password=password)
-        except:
-            messages.warning(request, 'This Username has already been taken.')
+        # Check if the username already exists to prevent duplication
+        if User.objects.filter(username=username).exists():
+            messages.warning(request, 'This username has already been taken.')
             return redirect('register')
-        # user.is_superuser = True
+
+        # Create new user if username is unique
+        user = User.objects.create_user(username=username, password=password)
         user.save()
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
+        login(request, user)  # Log in the newly registered user
         messages.success(request, 'Registration successful!')
         return redirect('index')
 
+    return render(request, 'register.html')
+
+
     return render(request, 'register.html', {})
 
+def logout_user(request):
+    username = request.user.username
+    logout(request)
+    messages.success(request, f'You have been logged out, {username}.')
+    return redirect('login_user')
 
-def get_player_position(player_id):
-    """Retrieve the position of a player."""
-    try:
-        player_info = commonplayerinfo.CommonPlayerInfo(player_id=player_id)
-        player_details = player_info.get_data_frames()[0]
-        position = player_details['POSITION'].iloc[0]
-        return position if position else 'N/A'
-    except Exception as e:
-        logger.error(f"Failed to fetch position for player {player_id}: {str(e)}")
-        return 'N/A'
-
-def get_active_players():
-    """Get active NBA players."""
-    # Get active NBA players
-    active_players = players.get_active_players()
-
-    # List to store player data
-    player_data = []
-
-    # Counter for limiting to 15 players
-    count = 0
-
-    # Iterate over each active player
-    for player in active_players:
-        # Get player career stats
-        career = playercareerstats.PlayerCareerStats(player_id=player['id'])
-        career_stats = career.get_data_frames()[0]
-
-        # Fetch the player's position using the new function
-        position = get_player_position(player['id'])
-
-        # Extract necessary data
-        player_stats = {
-            'full_name': player['full_name'],
-            'position': position,
-            'ppg': career_stats.iloc[0]['PTS'] / career_stats.iloc[0]['GP'], # Points per game
-            'rpg': career_stats.iloc[0]['REB'] / career_stats.iloc[0]['GP'], # Rebounds per game
-            'apg': career_stats.iloc[0]['AST'] / career_stats.iloc[0]['GP']  # Assists per game
-        }
-
-        # Append player data to list
-        player_data.append(player_stats)
-
-        # Increment counter
-        count += 1
-
-        # Break loop if 15 players have been collected
-        if count == 10:
-            break
-
-    return player_data
-
-# def index(request):
-#     """Render index page."""
-#     # pass
-# #     # Get player data
-#     players_data = get_active_players()
-#     # players_data = []
-#     return render(request, 'index.html', {'players': players_data})
-
-import logging
-import json
-from django.shortcuts import render
-from nba_api.stats.static import players
-from django.http import HttpResponse
-
-# Configuring logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
-# file_path = 'stats\data.json'
 file_path = "stats/data.json"
-num_sorts_by_position = 2
+num_sorts_by_position = 0
+num_positions = 5
 data = None
 
 def load_data():
@@ -140,27 +79,34 @@ def load_data():
         print("The file was not found:", file_path)
     except json.JSONDecodeError:
         print("Failed to decode JSON from the file:", file_path)
-
 def get_players_by_position():
     """Retrieve the position of players."""
     global num_sorts_by_position
     sorted_players = []
-    if num_sorts_by_position % 3 == 0:
+    if num_sorts_by_position % num_positions == 0:
         for value in data['data']:
             if value['player']['position'] == 'C':
                 sorted_players.append(value)
-    elif num_sorts_by_position % 3 == 1:
+    elif num_sorts_by_position % num_positions == 1:
         for value in data['data']:
             if value['player']['position'] == 'F':
                 sorted_players.append(value)
-    else:
+    elif num_sorts_by_position % num_positions == 2:
         for value in data['data']:
             if value['player']['position'] == 'G':
+                sorted_players.append(value)
+    elif num_sorts_by_position % num_positions == 4:
+        for value in data['data']:
+            if value['player']['position'] == 'F-G':
+                sorted_players.append(value)
+    else:
+        for value in data['data']:
+            if value['player']['position'] == 'F-C':
                 sorted_players.append(value)
     num_sorts_by_position += 1
     return sorted_players
 
-def get_players(sort_option):
+def get_players(sort_option, efficiency_sort):
     """Get active NBA players."""
     player_data = []
     load_data()
@@ -185,37 +131,95 @@ def get_players(sort_option):
     # Iterate over each active player
     result_data = []
     for index, player in enumerate(unique_players, start=1):
+        efficiency = ((player['pts'] * player['reb']) / (player['turnover'] + 100))
         player_stats = {
             'full_name': player['player']['first_name'] + ' ' + player['player']['last_name'],
             'position': player['player']['position'],
             'pts': player['pts'],
             'reb': player['reb'],
             'turnover': player['turnover'],
+            'efficiency': efficiency,
             'rank': index
         }
         result_data.append(player_stats)
 
+    if efficiency_sort:
+        print('This works')
+        result_data = sorted(result_data, key=lambda x: x['efficiency'], reverse=True)
+        for index, player in enumerate(result_data, start=1):
+            player['rank'] = index
     return result_data
+
+
+
+def fetch_live_and_upcoming_scores():
+    try:
+        # Initialize the scoreboard
+        games = scoreboard.ScoreBoard()
+        
+        # Fetching the live scoreboard as a dictionary
+        games_data = games.get_dict()
+        
+        # Simplifying the data extraction process
+        games_list = []
+        for game in games_data['scoreboard']['games']:
+            # Check if the game is live or upcoming by checking if scores are present
+            if game['homeTeam']['score'] == 0 and game['awayTeam']['score'] == 0:
+                game_status = "Upcoming"
+            else:
+                game_status = "Live"
+
+            game_info = {
+                'home_team': f"{game['homeTeam']['teamCity']} {game['homeTeam']['teamName']}",
+                'away_team': f"{game['awayTeam']['teamCity']} {game['awayTeam']['teamName']}",
+                'home_score': game['homeTeam']['score'],
+                'away_score': game['awayTeam']['score'],
+                'status': game['gameStatusText'], 
+                'series_text': game.get('seriesText', 'N/A'), 
+                'game_status': game_status  
+            }
+            games_list.append(game_info)
+        return games_list
+        
+    except Exception as e:
+        print(f"Failed to fetch NBA scores: {e}")
+        return None
+
+
+
+
 
 @login_required(login_url=login_user)
 def index(request):
+    game_data = fetch_live_and_upcoming_scores() or None
     """Render index page."""
     # Get player data
-    players_data = get_players(1)
     if request.method == 'POST':
-        if 'button' in request.POST:
-            action_value = request.POST['button']
-            if action_value == 'by_name':
-                get_players(3)
-                return HttpResponse("Button 1 was clicked.")
-            elif action_value == 'by_points':
-                get_players(2)
-                return HttpResponse("Button 2 was clicked.")
-            elif action_value == 'by_position':
-                get_players(1)
+        action_value = request.POST.get('button')
+        if action_value == 'by_efficiency':
+            players_data = get_players(3, True)
+        elif action_value == 'by_rebounds':
+            players_data = get_players(3, False)
+        elif action_value == 'by_points':
+            players_data = get_players(2, False)
+        elif action_value == 'by_position':
+            players_data = get_players(1, False)
+    elif request.method == 'GET':
+        players_data = None
 
-    # print(players_data)
-    return render(request, 'index.html', {'players': players_data})
+    # players_data = get_players(2, False)
+    return render(request, 'index.html', {'players': players_data, 'game_data': game_data})
+
+
+from django.http import JsonResponse
+
+def fetch_scores(request):
+    game_data = fetch_live_and_upcoming_scores()
+    if game_data:
+        data = {'games': game_data}
+    else:
+        data = {'games': []}  # Send empty list if no data available
+    return JsonResponse(data)
 
 
 
@@ -261,12 +265,7 @@ def search(request):
         return render(request, 'stats/search.html', {'search_results': []})
 
 
-
-
-def logout_user(request):
-    logout(request)
-    return redirect('login_user')
-
+#
     
 
 if __name__=="__main__":
