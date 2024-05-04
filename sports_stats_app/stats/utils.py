@@ -27,10 +27,6 @@ def get_player_by_name_variants(first_name):
                 return data['data']  # Return the first player that matches the name
     return None
 
-# Call the function and print the results for LeBron James
-# player_info = get_player_by_name_variants('Lebron', 'james')
-# print(player_info)
-
 
 import json
 from django.shortcuts import render
