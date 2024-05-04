@@ -3,19 +3,61 @@
 {% block content %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<div class="container my-4">
-    <div class="text-center mb-3">
-        <h2>Stats Table</h2>
-        <div>
-            <button onclick="window.location.reload()" class="btn btn-primary">Refresh</button>
-        </div>
-        <form action="{% url 'index' %}" method="post" class="d-flex justify-content-center gap-2 mt-3">
-            {% csrf_token %}
-            <button class="btn btn-primary" type="submit" name="by_name">By Name</button>
-            <button class="btn btn-secondary" type="submit" name="by_points">Points</button>
-            <button class="btn btn-success" type="submit" name="by_position">By Position</button>
-        </form>
+<style>
+    .live-scores-container {
+        position: relative;
+        margin-top: 1rem; /* Space below the navbar */
+        padding: 0 1rem;
+        overflow-x: auto; /* Enables horizontal scrolling */
+        white-space: nowrap; /* Keeps cards in a single line */
+    }
+    .score-card {
+        display: inline-block; /* Cards aligned horizontally */
+        width: 300px; /* Fixed width for each card */
+        margin-right: 20px; /* Space between cards */
+        background-color: #fff;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        border-radius: 0.5rem;
+    }
+    .score-header {
+        background-color: #007bff; /* Bootstrap primary color for header */
+        color: #fff;
+        padding: 0.75rem 1.25rem;
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+    }
+    .card-body {
+        padding: 0.75rem 1.25rem;
+    }
+</style>
+<div class="container-fluid">
+    <div class="live-scores-container">
+        <h4 class="text-center">NBA Live Scores</h4>
+        {% if error_message %}
+            <div class="alert alert-danger">{{ error_message }}</div>
+        {% endif %}
+        {% if game_data %}
+            {% for game in game_data %}
+                <div class="score-card">
+                    <div class="score-header">
+                        {{ game.home_team }} vs {{ game.away_team }}
+                    </div>
+                    <div class="card-body">
+                        <p>Score: {{ game.home_score }} - {{ game.away_score }}</p>
+                        <p>Status: {{ game.status }}</p>
+                        <p>Series: {{ game.series_text }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No live game data available at this moment.</p>
+        {% endif %}
     </div>
+</div>
+
+<div class="container my-4">
+    <h2 class="text-center mb-3">Player Stats Table</h2>
     <table class="table table-striped table-hover" id="statsTable">
         <thead class="table-dark">
             <tr>
@@ -45,51 +87,4 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-  function sortTable(n) {
-    var table,
-      rows,
-      switching,
-      i,
-      x,
-      y,
-      shouldSwitch,
-      dir,
-      switchcount = 0;
-    table = document.getElementById("statsTable");
-    switching = true;
-    dir = "asc"; // Set the sorting direction to ascending initially
-    while (switching) {
-      switching = false;
-      rows = table.rows;
-      for (i = 1; i < rows.length - 1; i++) {
-        shouldSwitch = false;
-        x = rows[i].getElementsByTagName("TD")[n];
-        y = rows[i + 1].getElementsByTagName("TD")[n];
-        if (dir == "asc") {
-          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-            shouldSwitch = true;
-            break;
-          }
-        } else if (dir == "desc") {
-          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-            shouldSwitch = true;
-            break;
-          }
-        }
-      }
-      if (shouldSwitch) {
-        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-        switching = true;
-        switchcount++;
-      } else {
-        if (switchcount == 0 && dir == "asc") {
-          dir = "desc";
-          switching = true;
-        }
-      }
-    }
-  }
-</script>
 {% endblock content %}

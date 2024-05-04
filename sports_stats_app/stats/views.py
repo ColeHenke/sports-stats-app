@@ -7,6 +7,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .utils import get_player_by_name_variants
+import json
 
 
 # Login Function 
@@ -19,41 +20,48 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            messages.success(request, f'You have successfully logged in {request.user.username}...')
             return redirect('index')
         else:
-            # Display appropriate error messages for invalid credentials
+            # Check if the user exists to provide a specific error message
             user_exists = User.objects.filter(username=username).exists()
             if user_exists:
                 messages.error(request, 'Invalid password. Please try again.')
             else:
                 messages.error(request, 'Invalid username. Please try again.')
-            return render(request, 'login.html')
+            return render(request, 'login.html', {'username': username})
 
     # Show the login page for GET requests
     return render(request, 'login.html')
 
-
 def register(request):
     if request.method == 'POST':
-        # get the username and password
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        try:
-            # check if th username and password is valid then try to create new account 
-            user = User.objects.create_user(username=username, password=password)
-        except:
-            messages.warning(request, 'This Username has already been taken.')
+        # Check if the username already exists to prevent duplication
+        if User.objects.filter(username=username).exists():
+            messages.warning(request, 'This username has already been taken.')
             return redirect('register')
-        # user.is_superuser = True
+
+        # Create new user if username is unique
+        user = User.objects.create_user(username=username, password=password)
         user.save()
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
+        login(request, user)  # Log in the newly registered user
         messages.success(request, 'Registration successful!')
         return redirect('index')
 
+    return render(request, 'register.html')
+
+
     return render(request, 'register.html', {})
+
+def logout_user(request):
+    username = request.user.username
+    logout(request)
+    messages.success(request, f'You have been logged out, {username}.')
+    return redirect('login_user')
+
 
 
 def get_player_position(player_id):
@@ -116,11 +124,6 @@ def get_active_players():
 #     # players_data = []
 #     return render(request, 'index.html', {'players': players_data})
 
-import logging
-import json
-from django.shortcuts import render
-from nba_api.stats.static import players
-from django.http import HttpResponse
 
 # Configuring logging
 logging.basicConfig(level=logging.DEBUG)
@@ -196,9 +199,54 @@ def get_players(sort_option):
         result_data.append(player_stats)
 
     return result_data
+# function to get the live score of the current games 
+from django.shortcuts import render
+from django.http import HttpResponse
+from nba_api.live.nba.endpoints import scoreboard
+
+from nba_api.live.nba.endpoints import scoreboard
+import datetime
+
+def fetch_live_and_upcoming_scores():
+    try:
+        # Initialize the scoreboard
+        games = scoreboard.ScoreBoard()
+        
+        # Fetching the live scoreboard as a dictionary
+        games_data = games.get_dict()
+        
+        # Simplifying the data extraction process
+        games_list = []
+        for game in games_data['scoreboard']['games']:
+            # Check if the game is live or upcoming by checking if scores are present
+            if game['homeTeam']['score'] == 0 and game['awayTeam']['score'] == 0:
+                game_status = "Upcoming"
+            else:
+                game_status = "Live"
+
+            game_info = {
+                'home_team': f"{game['homeTeam']['teamCity']} {game['homeTeam']['teamName']}",
+                'away_team': f"{game['awayTeam']['teamCity']} {game['awayTeam']['teamName']}",
+                'home_score': game['homeTeam']['score'],
+                'away_score': game['awayTeam']['score'],
+                'status': game['gameStatusText'], 
+                'series_text': game.get('seriesText', 'N/A'), 
+                'game_status': game_status  
+            }
+            games_list.append(game_info)
+        return games_list
+        
+    except Exception as e:
+        print(f"Failed to fetch NBA scores: {e}")
+        return None
+
+
+
+
 
 @login_required(login_url=login_user)
 def index(request):
+    game_data = fetch_live_and_upcoming_scores() or None
     """Render index page."""
     # Get player data
     players_data = get_players(1)
@@ -215,8 +263,7 @@ def index(request):
                 get_players(1)
 
     # print(players_data)
-    return render(request, 'index.html', {'players': players_data})
-
+    return render(request, 'index.html', {'players': players_data, 'game_data': game_data})
 
 
 @login_required(login_url=login_user)
@@ -261,12 +308,7 @@ def search(request):
         return render(request, 'stats/search.html', {'search_results': []})
 
 
-
-
-def logout_user(request):
-    logout(request)
-    return redirect('login_user')
-
+#
     
 
 if __name__=="__main__":

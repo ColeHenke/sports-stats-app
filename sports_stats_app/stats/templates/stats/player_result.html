@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center" style="height: 50vh;">
+<div class="container d-flex justify-content-center align-items-center mt-5">
     
     {% if search_results %}
         <table class="table table-striped">
@@ -24,24 +24,21 @@
             </thead>
             <tbody>
                 {% for result in search_results %}
-                    {{result.full_name}}
-
-                <tr>
-                    <td>{{ result.id }}</td>
-                    <td>{{ result.first_name }}</td>
-                    <td>{{ result.last_name }}</td>
-                    <td>{{ result.position }}</td>
-                    <td>{{ result.height }}</td>
-                    <td>{{ result.weight }}</td>
-                    <td>{{ result.jersey_number }}</td>
-                    <td>{{ result.college }}</td>
-                    <td>{{ result.country }}</td>
-                    <td>{{ result.draft_year }}</td>
-                    <td>{{ result.draft_round }}</td>
-                    <td>{{ result.draft_number }}</td>
-                    <td>{{ result.team_name }}</td>
-
-                </tr>   
+                    <tr>
+                        <td>{{ result.id }}</td>
+                        <td>{{ result.first_name }}</td>
+                        <td>{{ result.last_name }}</td>
+                        <td>{{ result.position }}</td>
+                        <td>{{ result.height }}</td>
+                        <td>{{ result.weight }}</td>
+                        <td>{{ result.jersey_number }}</td>
+                        <td>{{ result.college }}</td>
+                        <td>{{ result.country }}</td>
+                        <td>{{ result.draft_year }}</td>
+                        <td>{{ result.draft_round }}</td>
+                        <td>{{ result.draft_number }}</td>
+                        <td>{{ result.team_name }}</td>
+                    </tr>   
                 {% endfor %}
             </tbody>
         </table>
