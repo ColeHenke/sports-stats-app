@@ -1,0 +1,68 @@
+/* Reset CSS to ensure consistent styling across browsers */
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.page-container {
+    min-height: 100vh; /* Full viewport height */
+    position: relative; /* For footer positioning */
+    padding: 0; /* Remove padding that could affect inner elements */
+    box-sizing: border-box; /* Ensure padding and borders are included in element's total width and height */
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%; /* Ensures footer stretches across all horizontal space */
+    height: 60px;
+    background-color: #343a40;
+    color: white;
+    line-height: 60px;
+    text-align: center;
+}
+
+.navbar-custom {
+    background-color: #343a40;
+    padding: 0 15px; /* Modify padding to ensure full-width usage */
+}
+
+.navbar-brand, .nav-link {
+    font-size: 1.2em;
+}
+
+
+
+
+
+
+/* the logo styles */
+  @keyframes slideFadeInUp {
+        0%, 100% {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        10%, 90% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .navbar-brand {
+        font-family: sans-serif;
+        cursor: pointer;
+        overflow: hidden; /* Ensures the animation does not show outside the bounds */
+        display: inline-block;
+    }
+
+    .animated-text {
+        display: inline-block;
+        opacity: 0; /* Start fully transparent */
+        animation: slideFadeInUp 5s ease-in-out infinite; /* Animation will play forever */
+    }
+
+
+    .animated-text-app {
+        animation-delay: 2.5s; /* Stagger the appearance of 'Application' */
+    }

@@ -2,145 +2,138 @@
 
 {% block content %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
-
 <style>
-    .live-scores-container {
-        position: relative;
-        margin-top: 20px; 
-        margin-bottom: 20px; 
-        white-space: nowrap; /* Keeps cards in a single line */
-        overflow-x: hidden; /* Hide overflow and allow ticker to move */
+  .live-scores-ticker {
+    position: relative;
+    width: 100%;
+    /* Ensures it takes the full width of its container */
+    white-space: nowrap;
+    overflow-x: hidden;
+    margin: 0;
+    /* Removes any default margin */
+    padding: 10px 0;
+  }
+
+
+  .scores-marquee {
+    display: flex;
+    animation: marquee 60s linear infinite;
+    /* Adjusted time for continuous effect */
+  }
+
+  .score-card {
+    flex: 0 0 auto;
+    /* Prevents cards from stretching */
+    width: 300px;
+    /* Adjust width of each card for more cards in view */
+    margin-right: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    /* Ensures content does not spill out */
+  }
+
+  .score-header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
+
+  .card-body {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translate3d(100%, 0, 0);
     }
-    .scores-marquee {
-        display: block;
-        width: max-content;
-        animation: marquee 20s linear infinite;
+
+    to {
+      transform: translate3d(-100%, 0, 0);
     }
-    .score-card {
-        display: inline-block; /* Cards aligned horizontally */
-        width: 400px; /* Reduced width for each card */
-        margin-right: 15px; /* Reduced space between cards */
-        background-color: #fff;
-        border: 1px solid #ccc;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        border-radius: 0.5rem;
-    }
-    .score-header {
-        background-color: #007bff; /* Bootstrap primary color for header */
-        color: #fff;
-        padding: 0.5rem 2.75rem; /* Reduced padding for smaller header */
-        border-top-left-radius: 0.5rem;
-        border-top-right-radius: 0.5rem;
-    }
-    .card-body {
-        padding: 0.5rem 0.75rem; /* Reduced padding for smaller card body */
-        display: flex; /* Set display to flex */
-        flex-direction: column; /* Stack children vertically */
-        justify-content: center; /* Center content vertically in the container */
-        align-items: center; /* Center content horizontally */
-    }
-    @keyframes marquee {
-        0% { transform: translateX(100%); }
-        100% { transform: translateX(-100%); }
-    }
+  }
+
+  .table-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  button {
+    margin-bottom: 40px;
+  }
 </style>
-<div class="container-fluid">
-    <div class="live-scores-container">
-        <h4 class="text-center">NBA Live Scores</h4>
-        <div class="scores-marquee">
-            {% if error_message %}
-                <div class="alert alert-danger">{{ error_message }}</div>
-            {% endif %}
-            {% if game_data %}
-                {% for game in game_data %}
-                <div class="score-card" id="score-card-{{ forloop.counter0 }}">
-                    <div class="score-header">
-                        {{ game.home_team }} vs {{ game.away_team }}
-                    </div>
-                    <div class="card-body">
-                        <p>Score: {{ game.home_score }} - {{ game.away_score }}</p>
-                        <p>Status: {{ game.status }}</p>
-                        <p>Series: {{ game.series_text }}</p>
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>No live game data available at this moment.</p>
-            {% endif %}
-        </div>
+
+
+<div class="live-scores-ticker">
+  {% if error_message %}
+  <div class="alert alert-danger">{{ error_message }}</div>
+  {% endif %}
+  <div class="scores-marquee">
+    {% if game_data %}
+    {% for game in game_data %}
+    <div class="score-card">
+      <div class="score-header">{{ game.home_team }} vs {{ game.away_team }}</div>
+      <div class="card-body">
+        <div>Score: {{ game.home_score }} - {{ game.away_score }}</div>
+        <div>Status: {{ game.status }}</div>
+        <div>Series: {{ game.series_text }}</div>
+      </div>
     </div>
-</div>
-<div class="text-center mb-3">
-  <h2>Stats Table</h2>
-  <form
-    action="{% url 'index' %}"
-    method="post"
-    class="d-flex justify-content-center gap-2 mt-3"
-  >
-    {% csrf_token %}
-    <button
-      class="btn btn-success"
-      type="submit"
-      name="button"
-      value="by_position"
-    >
-      By Position
-    </button>
-    <button
-      class="btn btn-secondary"
-      type="submit"
-      name="button"
-      value="by_points"
-    >
-      By Points
-    </button>
-    <button
-      class="btn btn-primary"
-      type="submit"
-      name="button"
-      value="by_rebounds"
-    >
-      By Rebounds
-    </button>
-    <button
-      class="btn btn-danger"
-      type="submit"
-      name="button"
-      value="by_efficiency"
-    >
-      By Efficiency
-    </button>
-  </form>
-</div>
-<div class="container-fluid">
-<table class="table table-striped table-hover" id="statsTable">
-  <thead class="table-dark">
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Rank</th>
-      <th scope="col">Position</th>
-      <th scope="col">Points</th>
-      <th scope="col">Rebounds</th>
-      <th scope="col">Efficiency</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for player in players %}
-    <tr>
-      <td>{{ player.full_name }}</td>
-      <td>{{ player.rank }}</td>
-      <td>{{ player.position }}</td>
-      <td>{{ player.pts|floatformat:1 }}</td>
-      <td>{{ player.reb|floatformat:1 }}</td>
-      <td>{{ player.efficiency|floatformat:1 }}</td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="6">Click on a filter to load some players!!</td>
-    </tr>
     {% endfor %}
-  </tbody>
-</table>
+    {% else %}
+    <div class="score-card">
+      <div class="card-body">No live game data available at this moment.</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+
+<div class="container table-container">
+  <h2 class="text-center">Stats Table</h2>
+  <form action="{% url 'index' %}" method="post" class="d-flex justify-content-center gap-2 mt-3">
+    {% csrf_token %}
+    <button class="btn btn-success" type="submit" name="button" value="by_position">By Position</button>
+    <button class="btn btn-secondary" type="submit" name="button" value="by_points">By Points</button>
+    <button class="btn btn-primary" type="submit" name="button" value="by_rebounds">By Rebounds</button>
+    <button class="btn btn-danger" type="submit" name="button" value="by_efficiency">By Efficiency</button>
+  </form>
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Rank</th>
+        <th scope="col">Position</th>
+        <th scope="col">Points</th>
+        <th scope="col">Rebounds</th>
+        <th scope="col">Efficiency</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for player in players %}
+      <tr>
+        <td><a href="{% url 'search_selected_player' player.first_name %}">{{ player.full_name }}</a></td>
+        <td>{{ player.rank }}</td>
+        <td>{{ player.position }}</td>
+        <td>{{ player.pts|floatformat:1 }}</td>
+        <td>{{ player.reb|floatformat:1 }}</td>
+        <td>{{ player.efficiency|floatformat:1 }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6">Click on a filter to load some players!!</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
 
@@ -148,30 +141,30 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-$(document).ready(function() {
+  $(document).ready(function () {
     function fetchData() {
-        $.ajax({
-            url: '{% url "fetch-scores" %}',  // Use Django URL tag to resolve URL
-            type: 'GET',
-            dataType: 'json',
-            success: function(data) {
-                if (data.games) {
-                    data.games.forEach(function(game, index) {
-                        $('#score-card-' + index).find('.score-header').text(game.home_team + ' vs ' + game.away_team);
-                        $('#score-card-' + index).find('.card-body p').first().text('Score: ' + game.home_score + ' - ' + game.away_score);
-                        $('#score-card-' + index).find('.card-body p').eq(1).text('Status: ' + game.status);
-                        $('#score-card-' + index).find('.card-body p').eq(2).text('Series: ' + game.series_text);
-                    });
-                    console.log(data.games)
-                }
-            },
-            error: function(error) {
-                console.log('Error:', error);
-            }
-        });
+      $.ajax({
+        url: '{% url "fetch-scores" %}',  // Use Django URL tag to resolve URL
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+          if (data.games) {
+            data.games.forEach(function (game, index) {
+              $('#score-card-' + index).find('.score-header').text(game.home_team + ' vs ' + game.away_team);
+              $('#score-card-' + index).find('.card-body p').first().text('Score: ' + game.home_score + ' - ' + game.away_score);
+              $('#score-card-' + index).find('.card-body p').eq(1).text('Status: ' + game.status);
+              $('#score-card-' + index).find('.card-body p').eq(2).text('Series: ' + game.series_text);
+            });
+            console.log(data.games)
+          }
+        },
+        error: function (error) {
+          console.log('Error:', error);
+        }
+      });
     }
 
     setInterval(fetchData, 10000); // Refresh every 10 seconds
-});
+  });
 </script>
 {% endblock content %}

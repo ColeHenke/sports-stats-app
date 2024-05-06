@@ -3,43 +3,65 @@
 {% block content %}
 <style>
     body {
-        font-family: Arial, sans-serif; /* Sets the font for the page */
+        font-family: Arial, sans-serif;
+        /* Sets the font for the page */
     }
-    .container {
-        max-width: 1200px; /* Restricts the table's max width */
-    }
+
+    /* .container {
+        max-width: 1200px;
+    } */
     .header {
         text-align: center;
         margin-top: 20px;
-        font-size: 24px; /* Larger text for the header */
-        color: #333; /* Dark grey text color */
+        font-size: 24px;
+        /* Larger text for the header */
+        color: #333;
+        /* Dark grey text color */
     }
+
     .table {
         width: 100%;
         margin-top: 20px;
-        border-collapse: collapse; /* Ensures borders between cells are merged */
+        border-collapse: collapse;
+        /* Ensures borders between cells are merged */
     }
-    .table th, .table td {
-        padding: 12px 15px; /* Padding inside each table cell */
-        border: 1px solid #ddd; /* Light grey border around cells */
-        text-align: left; /* Aligns text to the left */
+
+    .table th,
+    .table td {
+        padding: 12px 15px;
+        /* Padding inside each table cell */
+        border: 1px solid #ddd;
+        /* Light grey border around cells */
+        text-align: left;
+        /* Aligns text to the left */
     }
+
     .table th {
-        background-color: #333; /* Dark grey background for header */
-        color: #fff; /* White text color for header */
+        background-color: #333;
+        /* Dark grey background for header */
+        color: #fff;
+        /* White text color for header */
     }
+
     .table tr:nth-child(odd) {
-        background-color: #fff; /* White background for odd rows */
+        background-color: #fff;
+        /* White background for odd rows */
     }
+
     .table tr:nth-child(even) {
-        background-color: #f9f9f9; /* Lighter grey background for even rows */
+        background-color: #f9f9f9;
+        /* Lighter grey background for even rows */
     }
+
     .table tr:hover {
-        background-color: #ddf; /* Light blue background on hover */
+        background-color: #ddf;
+        /* Light blue background on hover */
     }
+
     .table thead {
         position: sticky;
-        top: 0; /* Makes the header sticky */
+        top: 0;
+        /* Makes the header sticky */
         z-index: 1000;
     }
 </style>
@@ -47,48 +69,48 @@
     <div class="header">
         <h2>Players Information</h2> <!-- Corrected header text -->
     </div>
-    
+
     {% if search_results %}
-        <table class="table table-striped bordered table-hover">
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">ID</th> 
-                    <th scope="col">First Name</th> 
-                    <th scope="col">Last Name</th>
-                    <th scope="col">Position</th>
-                    <th scope="col">Height</th>
-                    <th scope="col">Weight</th>
-                    <th scope="col">Jersey Number</th>
-                    <th scope="col">College</th>
-                    <th scope="col">Country</th>
-                    <th scope="col">Draft Year</th>
-                    <th scope="col">Draft Round</th>
-                    <th scope="col">Draft Number</th>
-                    <th scope="col">Team</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for result in search_results %}
-                <tr>
-                    <td>{{ result.id }}</td>
-                    <td>{{ result.first_name }}</td>
-                    <td>{{ result.last_name }}</td>
-                    <td>{{ result.position }}</td>
-                    <td>{{ result.height }}</td>
-                    <td>{{ result.weight }}</td>
-                    <td>{{ result.jersey_number }}</td>
-                    <td>{{ result.college }}</td>
-                    <td>{{ result.country }}</td>
-                    <td>{{ result.draft_year }}</td>
-                    <td>{{ result.draft_round }}</td>
-                    <td>{{ result.draft_number }}</td>
-                    <td>{{ result.team_name }}</td>
-                </tr>   
-                {% endfor %}
-            </tbody>
-        </table>
+    <table class="table table-striped bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">First Name</th>
+                <th scope="col">Last Name</th>
+                <th scope="col">Position</th>
+                <th scope="col">Height</th>
+                <th scope="col">Weight</th>
+                <th scope="col">Jersey Number</th>
+                <th scope="col">College</th>
+                <th scope="col">Country</th>
+                <th scope="col">Draft Year</th>
+                <th scope="col">Draft Round</th>
+                <th scope="col">Draft Number</th>
+                <th scope="col">Team</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in search_results %}
+            <tr>
+                <td>{{ result.id }}</td>
+                <td>{{ result.first_name }}</td>
+                <td>{{ result.last_name }}</td>
+                <td>{{ result.position }}</td>
+                <td>{{ result.height }}</td>
+                <td>{{ result.weight }}</td>
+                <td>{{ result.jersey_number }}</td>
+                <td>{{ result.college }}</td>
+                <td>{{ result.country }}</td>
+                <td>{{ result.draft_year }}</td>
+                <td>{{ result.draft_round }}</td>
+                <td>{{ result.draft_number }}</td>
+                <td>{{ result.team_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     {% else %}
-        <p>No results found.</p>
+    <p>No results found.</p>
     {% endif %}
 </div>
 {% endblock content %}

@@ -1,13 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<style>
-    #adminpassword,
-    #adminName,
-    #usertype-container {
-        display: none;
-    }
-</style>
+
 
 <div class="containerlogin">
     <div class="heading">Register</div>
@@ -18,7 +12,7 @@
         {% comment %} <input placeholder="Confirm Password" name="confirm_password" type="password" class="input"
             id="confirm-password" required=""> {% endcomment %}
 
-    
+
         <input type="submit" value="Register" class="login-button">
         <a href="{% url 'login_user' %}" class="btn  btn-block login-button">Login</a>
     </form>
