@@ -71,10 +71,10 @@ def logout_user(request):
 
 
 class PlayerStatsLoader:
+    num_sorts_by_position = 0
     def __init__(self, file_path="stats/data.json"):
         self.file_path = file_path
         self.data = self.load_data()
-        self.num_sorts_by_position = 0
         self.num_positions = 5
 
     def load_data(self):
@@ -91,7 +91,7 @@ class PlayerStatsLoader:
         position_map = {0: 'C', 1: 'F', 2: 'G', 3: 'F-G', 4: 'F-C'}
         current_position = self.num_sorts_by_position % self.num_positions
         sorted_players = [value for value in self.data['data'] if value['player']['position'] == position_map[current_position]]
-        self.num_sorts_by_position += 1
+        PlayerStatsLoader.num_sorts_by_position += 1
         return sorted_players
 
     def get_players(self, sort_option):
@@ -173,15 +173,13 @@ def fetch_live_and_upcoming_scores():
         print(f"Failed to fetch NBA scores: {e}")
         return None
 
-
-
-
 # Assuming `login_user` is a path to the login view
 @login_required(login_url='login_user')  # Corrected the login_url parameter to be a string path
 def index(request):
     game_data = fetch_live_and_upcoming_scores() or None
     psl = PlayerStatsLoader("stats/data.json")  # Load player stats using the class
     players_data = []
+    global sort_order
 
     if request.method == 'POST':
         action_value = request.POST.get('button')

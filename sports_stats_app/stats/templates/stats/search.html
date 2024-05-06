@@ -1,51 +1,50 @@
-{% extends "base.html" %}
-
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <div class="container d-flex justify-content-center align-items-center">
-
-    <div class="card" style="width: 500px;">
-        <div class="card-body">
-            <h5 class="card-title">Search</h5>
-            <form method="POST" action="{% url 'search' %}">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter username">
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+  <div class="card" style="width: 500px">
+    <div class="card-body">
+      <h5 class="card-title">Search</h5>
+      <form method="POST" action="{% url 'search' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="username" class="form-label">Player</label>
+          <input
+            type="text"
+            class="form-control"
+            id="username"
+            name="username"
+            placeholder="Enter player name"
+          />
         </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
     </div>
+  </div>
 </div>
 
 {% if search_history %}
-    <div class="container">
-    <h2>Search History</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Player Name</th>
-                <th>Position</th>
-                <th>Team</th>
-                <th>Search Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for entry in search_history %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ entry.first_name }} {{ entry.last_name }}</td>
-                <td>{{ entry.position }}</td>
-                <td>{{ entry.team }}</td>
-                <td>{{ entry.search_timestamp }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="container">
+  <h2>Search History</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Player Name</th>
+        <th>Position</th>
+        <th>Team</th>
+        <th>Search Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in search_history %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ entry.first_name }} {{ entry.last_name }}</td>
+        <td>{{ entry.position }}</td>
+        <td>{{ entry.team }}</td>
+        <td>{{ entry.search_timestamp }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
-{% else %}
-
-{% endif %}
-
-{% endblock content %}
+{% else %} {% endif %} {% endblock content %}
